@@ -57,7 +57,7 @@ if "respuestas" not in st.session_state:
 
 # -------------------- SELECCIÓN DE ROL --------------------
 if st.session_state.rol is None:
-    st.markdown("### 🎅 ¿Eres docente o estudiante de psicología?")
+    st.markdown("### 🎅 ¿Eres docente o estudiante?")
     rol = st.radio("", ["Docente", "Estudiante"])
 
     if st.button("Iniciar Quiz 🎁"):
