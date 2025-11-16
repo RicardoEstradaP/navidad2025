@@ -11,9 +11,9 @@ body {
 .navidad-box {
     padding: 20px;
     border-radius: 12px;
-    background: #ffffffaa;
-    border: 2px dashed #d62828;
-    box-shadow: 0 0 12px rgba(0,0,0,0.15);
+    background: #ffffffcc;
+    border: none; /* CORREGIDO: sin borde punteado */
+    box-shadow: 0 0 12px rgba(0,0,0,0.10);
 }
 h1 {
     color: #136f63;
@@ -107,12 +107,12 @@ else:
 
         st.markdown(f"### 🎄 Total de regalos asignados: **{regalos}** 🎁")
 
+        # -------------------- DISCLAIMER ACTUALIZADO --------------------
         st.markdown("""
         ---
-        ### 📬 *Disclaimer Navideño Importante*
-        Este quiz es solo para diversión.  
-        **No a Mayu y Ricky les corresponden los regalos**, sino que  
-        **le corresponde al evaluado enviar su reporte a Santa Claus** para aprobación oficial. 🎅  
+        ### 📬 *Aviso Navideño*
+        Pasa tu reporte, adjunto a tu carta para Santa Claus.  
+        **Mayu y Ricky no se hacen responsables si recibes puro carbón**  
         ¡Feliz Navidad! 🎄
         """)
 
