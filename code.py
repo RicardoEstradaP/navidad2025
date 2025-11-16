@@ -1,6 +1,6 @@
 import streamlit as st
 
-# ---------------------- DECORACIÓN NAVIDEÑA ----------------------
+# -------------------- CONFIGURACIÓN Y ESTILO --------------------
 st.set_page_config(page_title="Quiz Navideño de Bondad", page_icon="🎄")
 
 navidad_css = """
@@ -19,13 +19,6 @@ h1 {
     color: #136f63;
     text-shadow: 1px 1px 2px #fff;
 }
-.role-box {
-    background: #ffe8d6;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #ddbea9;
-    margin-bottom: 20px;
-}
 </style>
 """
 st.markdown(navidad_css, unsafe_allow_html=True)
@@ -33,74 +26,100 @@ st.markdown(navidad_css, unsafe_allow_html=True)
 st.markdown("<h1>🎄 Quiz Navideño de Bondad 🎁</h1>", unsafe_allow_html=True)
 st.markdown("<p style='font-size:18px;'>Descubre si este año te toca regalo, muchos regalos… o carbón. 👀</p>", unsafe_allow_html=True)
 
-st.markdown("<div class='navidad-box'>", unsafe_allow_html=True)
+
+# ---------- PREGUNTAS ---------------------
+preguntas_docente = [
+    "¿Has devuelto tareas con retroalimentación navideña, cálida y sin juzgar?",
+    "¿Has dado extensiones sin hacerlo ver como ‘un milagro’ de tu generosidad?",
+    "¿Has evitado regañar grupos completos por culpa de uno?",
+    "¿Has promovido el autocuidado emocional en tus estudiantes?",
+    "¿Has revisado trabajos antes del límite sin que te lo pidan 15 veces?"
+]
+
+preguntas_estudiante = [
+    "¿Has entregado tus actividades sin llorar en el último minuto?",
+    "¿Has sido amable con tus docentes incluso en semanas de parciales?",
+    "¿Has evitado hacer trabajos con IA sin criterio (y sin citar)?",
+    "¿Has apoyado emocionalmente a tus compañerxs cuando están saturados?",
+    "¿Has leído las instrucciones antes de preguntar?"
+]
+
+# -------------------- VARIABLES DE SESIÓN --------------------
+if "rol" not in st.session_state:
+    st.session_state.rol = None
+
+if "pregunta_actual" not in st.session_state:
+    st.session_state.pregunta_actual = 0
+
+if "respuestas" not in st.session_state:
+    st.session_state.respuestas = []
 
 
-# ---------------------- FILTRO DE ROL ----------------------
-st.markdown("### 🎅 ¿Eres docente o estudiante de psicología?")
-rol = st.radio("", ["Docente", "Estudiante"])
+# -------------------- SELECCIÓN DE ROL --------------------
+if st.session_state.rol is None:
+    st.markdown("### 🎅 ¿Eres docente o estudiante de psicología?")
+    rol = st.radio("", ["Docente", "Estudiante"])
 
+    if st.button("Iniciar Quiz 🎁"):
+        st.session_state.rol = rol
+        st.rerun()
 
-# ---------------------- PREGUNTAS ----------------------
+else:
+    st.markdown("<div class='navidad-box'>", unsafe_allow_html=True)
+    st.markdown(f"### 🎄 Rol seleccionado: **{st.session_state.rol}** 🎅")
 
-preguntas_docente = {
-    "¿Has devuelto tareas con retroalimentación navideña, cálida y sin juzgar?": 1,
-    "¿Has dado extensiones sin hacerlo ver como ‘un milagro’ de tu generosidad?": 1,
-    "¿Has evitado regañar grupos completos por culpa de uno?": 1,
-    "¿Has promovido el autocuidado emocional en tus estudiantes?": 1,
-    "¿Has revisado trabajos antes del límite sin que te lo pidan 15 veces?": 1,
-}
+    preguntas = preguntas_docente if st.session_state.rol == "Docente" else preguntas_estudiante
 
-preguntas_estudiante = {
-    "¿Has entregado tus actividades sin llorar en el último minuto?": 1,
-    "¿Has sido amable con tus docentes incluso en semanas de parciales?": 1,
-    "¿Has evitado hacer trabajos con IA sin criterio (y sin citar)?": 1,
-    "¿Has apoyado emocionalmente a tus compañerxs cuando están saturados?": 1,
-    "¿Has leído las instrucciones antes de preguntar?": 1,
-}
+    total_preguntas = len(preguntas)
+    idx = st.session_state.pregunta_actual
 
-# según rol seleccionamos preguntas
-preguntas = preguntas_docente if rol == "Docente" else preguntas_estudiante
+    # -------------------- MOSTRAR PREGUNTA ACTUAL --------------------
+    if idx < total_preguntas:
+        st.markdown(f"### 🎁 Pregunta {idx+1} de {total_preguntas}")
+        st.write(preguntas[idx])
 
+        respuesta = st.radio("Elige una opción", ["Sí", "No"], key=f"preg_{idx}")
 
-# ---------------------- RESPUESTAS ----------------------
-st.markdown("### 🎄 Responde con sinceridad navideña:")
+        if st.button("Siguiente ❄️"):
+            st.session_state.respuestas.append(respuesta)
+            st.session_state.pregunta_actual += 1
+            st.rerun()
 
-respuestas = []
-for pregunta in preguntas:
-    opcion = st.radio(pregunta, ["Sí", "No"], key=pregunta)
-    respuestas.append(opcion)
-
-
-# ---------------------- RESULTADOS ----------------------
-if st.button("🎁 Ver mi resultado navideño"):
-    puntaje = sum(1 for r in respuestas if r == "Sí")
-
-    st.markdown("## 🎄 Resultado Final 🎅")
-
-    if puntaje == 0:
-        st.error("😈 ¡Uy! Este año te toca carbón… del bueno, del que mancha. 🧱")
-        regalos = 0
-    elif puntaje <= 2:
-        st.warning("🎁 Te toca **un regalito**… chiquito, como tu fuerza de voluntad para no procrastinar.")
-        regalos = 1
-    elif puntaje <= 4:
-        st.success("🎁🎁 ¡Te corresponden **dos regalos**! Claramente tienes espíritu navideño moderado.")
-        regalos = 2
     else:
-        st.balloons()
-        st.success("🎁🎁🎁 ¡Eres la estrella del arbolito! Te corresponden **tres regalos y un abrazo psicológico**.")
-        regalos = 3
+        # -------------------- RESULTADOS --------------------
+        puntaje = st.session_state.respuestas.count("Sí")
 
-    st.markdown(f"### 🎄 Total de regalos asignados: **{regalos}** 🎁")
+        st.markdown("## 🎅 Resultado Final Navideño")
 
-    # DISCLAIMER
-    st.markdown("""
-    ---
-    ### 📬 *Disclaimer Navideño Importante*
-    Pasa tu reporte, adjunto a tu carta para Santa Claus.  
-    **Mayu y Ricky no se hacen responsables si recibes puro carbón**  
-    ¡Feliz Navidad! 🎄
-    """)
-    
-st.markdown("</div>", unsafe_allow_html=True)
+        if puntaje == 0:
+            st.error("😈 ¡Uy! Este año te toca carbón… del bueno, del que mancha. 🧱")
+            regalos = 0
+        elif puntaje <= 2:
+            st.warning("🎁 Te toca **un regalito**… chiquito, como tu fuerza para no procrastinar.")
+            regalos = 1
+        elif puntaje <= 4:
+            st.success("🎁🎁 ¡Te corresponden **dos regalos**! Claramente tienes espíritu navideño moderado.")
+            regalos = 2
+        else:
+            st.balloons()
+            st.success("🎁🎁🎁 ¡Eres la estrella del arbolito! Te corresponden **tres regalos y un abrazo psicológico**.")
+            regalos = 3
+
+        st.markdown(f"### 🎄 Total de regalos asignados: **{regalos}** 🎁")
+
+        st.markdown("""
+        ---
+        ### 📬 *Disclaimer Navideño Importante*
+        Este quiz es solo para diversión.  
+        **No a Mayu y Ricky les corresponden los regalos**, sino que  
+        **le corresponde al evaluado enviar su reporte a Santa Claus** para aprobación oficial. 🎅  
+        ¡Feliz Navidad! 🎄
+        """)
+
+        if st.button("Reiniciar 🎄"):
+            st.session_state.rol = None
+            st.session_state.pregunta_actual = 0
+            st.session_state.respuestas = []
+            st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
